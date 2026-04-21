@@ -164,6 +164,18 @@ ncu -i
 # 🔴 PELIGRO: Actualiza todo, incluyendo Major releases que rompen código
 ncu -u
 
+## 🐳 Dockerización (Listo para usar)
+
+El proyecto está completamente **dockerizado**, lo que permite desplegar tanto la **API** como la **Base de Datos** de forma automática y aislada. Al iniciar con Docker, el entorno queda configurado y listo para recibir peticiones.
+
+### Levantar el proyecto con Docker:
+
+1.  Asegúrate de tener instalado **Docker** y **Docker Compose**.
+2.  En la raíz del proyecto, ejecuta:
+    ```bash
+    docker-compose up --build
+    ```
+
 ## Soporte
 
 Nest es un proyecto de código abierto con licencia MIT. Puede crecer gracias a los patrocinadores y el apoyo de increíbles colaboradores. Si deseas unirte a ellos, por favor [lee más aquí](https://docs.nestjs.com/support).
