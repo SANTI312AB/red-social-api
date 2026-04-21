@@ -1,0 +1,435 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
+  compilerBuild   = "fast"
+}
+
+datasource db {
+  provider     = "mysql"
+  relationMode = "foreignKeys"
+}
+
+
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ciudades {
+  IDCIUDAD             Int                    @id @default(autoincrement())
+  NOMBRE_CIUDAD        String                 @db.VarChar(255)
+  IDPROVINCIA          Int?
+  ID_SERVIENTREGA      Int?
+  FREE_CITY            Boolean?
+  provincias           provincias?            @relation(fields: [IDPROVINCIA], references: [IDPROVINCIA], onDelete: NoAction, onUpdate: NoAction, map: "FK_FF770062082C90E")
+
+  @@index([IDPROVINCIA], map: "IDX_FF770062082C90E")
+}
+
+model comentarios_post {
+  ID_COMENTARIO    Int                @id @default(autoincrement())
+  COMENTARIO       String             @db.VarChar(500)
+  FECHA_COMENTARIO DateTime           @db.DateTime(0)
+  FECHA_EDICION    DateTime?          @db.DateTime(0)
+  ID_POST          Int
+  IDLOGIN          Int
+  post             post               @relation(fields: [ID_POST], references: [ID_POST], onDelete: Cascade, onUpdate: NoAction, map: "FK_53F66B632F2EA191")
+  login            login              @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_53F66B6343485913")
+  likes_comentario likes_comentario[]
+  respuestas_post  respuestas_post[]
+
+  @@index([ID_POST], map: "IDX_53F66B632F2EA191")
+  @@index([IDLOGIN], map: "IDX_53F66B6343485913")
+}
+
+model likes_comentario {
+  ID_LIKE       Int              @id @default(autoincrement())
+  ID_COMENTARIO Int
+  IDLOGIN       Int
+  FECHA         DateTime         @db.DateTime(0)
+  login         login            @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_53F66B6343485754")
+  comentario    comentarios_post @relation(fields: [ID_COMENTARIO], references: [ID_COMENTARIO], onDelete: Cascade, onUpdate: NoAction, map: "FK_70F66B6343485201")
+
+  @@unique([IDLOGIN, ID_COMENTARIO], map: "IDLOGIN_ID_COMENTARIO")
+  @@index([IDLOGIN], map: "FK_53F66B6343485754")
+  @@index([ID_COMENTARIO], map: "FK_70F66B6343485201")
+}
+
+model command_log {
+  ID_LOG         Int       @id @default(autoincrement())
+  MENSAJE        String?   @db.Text
+  DURACION_SEG   Int?
+  ESTADO         String    @db.VarChar(50)
+  FECHA_FIN      DateTime?
+  FECHA_INICIO   DateTime  @default(now())
+  NOMBRE_PROCESO String    @db.VarChar(255)
+}
+
+
+model estados {
+  IDESTADO                            Int                    @id @default(autoincrement())
+  NOMBRE_ESTADO                       String?                @db.VarChar(45)
+  TIPO_ESTADO                         String?                @db.VarChar(45)
+  ESTADO_SLUG                         String?                @db.VarChar(255)
+  login_login_IDVERIFICACIONToestados login[]                @relation("login_IDVERIFICACIONToestados")
+  login_login_IDESTADOToestados       login[]                @relation("login_IDESTADOToestados")
+  notificaciones                      notificaciones[]
+  usuarios                            usuarios[]
+}
+
+model funciones_especiales {
+  IDFUNCION      Int      @id @default(autoincrement())
+  NOMBRE_FUNCION String   @db.VarChar(255)
+  ACTIVO         Boolean?
+  DESCRIPCION    String?  @db.VarChar(255)
+  TIPO           String?  @db.VarChar(255)
+}
+
+
+model generales_app {
+  IDGENERALES_APP  Int     @id @default(autoincrement())
+  VALOR_GENERAL    String? @db.VarChar(300)
+  ATRIBUTO_GENERAL String? @db.VarChar(45)
+  TIPO_AMBIENTE    String? @db.VarChar(50)
+  TIPO_SERVICIO    String? @db.VarChar(255)
+  NOMBRE           String? @db.VarChar(255)
+}
+
+model login {
+  IDLOGIN                                  Int                   @id @default(autoincrement())
+  EMAIL_LOGIN                              String                @unique(map: "UNIQ_AA08CB10BDEA1D41") @db.VarChar(255)
+  USUARIO_LOGIN                            String                @unique(map: "UNIQ_AA08CB109636A6DD") @db.VarChar(500)
+  PASSWORD_LOGIN                           String?               @db.VarChar(200)
+  LAST_LOGIN                               DateTime?             @db.DateTime(0)
+  FECHA_REGISTRO_LOGIN                     DateTime?             @db.DateTime(0)
+  LOGIN_ROLES                              Json
+  IDESTADO                                 Int?
+  IDVERIFICACION                           Int?
+  GOOGLE_ID                                String?               @db.VarChar(255)
+  FACEBOOK_ID                              String?               @db.VarChar(255)
+  APPLE_ID                                 String?               @db.VarChar(255)
+  FECHA_EDICION_LOGIN                      DateTime?             @db.DateTime(0)
+  INTENTOS_FALLIDOS                        Int       @default(0)
+  BLOQUEADO_HASTA                          DateTime?
+  likes_comentario                         likes_comentario[]
+  likes_respuesta                          likes_respuesta[]
+  estados_login_IDVERIFICACIONToestados    estados?              @relation("login_IDVERIFICACIONToestados", fields: [IDVERIFICACION], references: [IDESTADO], onDelete: NoAction, onUpdate: NoAction, map: "FK_AA08CB103AB8AF19")
+  estados_login_IDESTADOToestados          estados?              @relation("login_IDESTADOToestados", fields: [IDESTADO], references: [IDESTADO], onDelete: NoAction, onUpdate: NoAction, map: "FK_AA08CB1084D3D003")
+  logs_api                                 logs_api[]
+  notificaciones                           notificaciones[]
+  opt                                      opt[]
+  post                                     post[]
+  post_reaccion                            post_reaccion[]
+  posts_guardados                          posts_guardados[]
+  comentarios_post                         comentarios_post[]
+  respuestas_post                          respuestas_post[]
+  seguidores_seguidores_ID_SEGUIDORTologin seguidores[]          @relation("seguidores_ID_SEGUIDORTologin")
+  seguidores_seguidores_ID_SEGUIDOTologin  seguidores[]          @relation("seguidores_ID_SEGUIDOTologin")
+  token                                    token[]
+  usuarios                                 usuarios?
+  login_dispositivos                       login_dispositivos[]
+
+  @@index([IDVERIFICACION], map: "IDX_AA08CB103AB8AF19")
+  @@index([IDESTADO], map: "IDX_AA08CB1084D3D003")
+}
+
+
+model dispositivos{
+  ID_DISPOSITIVO Int @id @default(autoincrement()) 
+  TOKEN          String @db.Text
+  CODIGO           String @db.VarChar(20)
+  FECHA_REGISTRO DateTime  @db.DateTime(0)
+  FECHA_ACTUALIZO DateTime @db.DateTime(0)
+  login_dispositivos login_dispositivos[]
+}
+
+
+model login_dispositivos {
+  IDLOGIN        Int
+  ID_DISPOSITIVO Int
+  login          login        @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: Cascade)
+  dispositivos   dispositivos @relation(fields: [ID_DISPOSITIVO], references: [ID_DISPOSITIVO], onDelete: Cascade)
+  // 👇 Clave primaria compuesta para la tabla intermedia
+  @@id([IDLOGIN, ID_DISPOSITIVO])
+  // 👇 Índices para mejorar la velocidad de búsqueda al enviar notificaciones
+  @@index([IDLOGIN])
+  @@index([ID_DISPOSITIVO])
+}
+model opt {
+  ID_OPT    Int      @id @default(autoincrement())
+  OTP       Int      @unique
+  TOKEN     String   @db.Text
+  expiresAt DateTime
+  createdAt DateTime @db.DateTime(0)
+  USADO     Boolean  @default(false)
+  TIPO      String?
+  IDLOGIN   Int
+  login     login    @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: Cascade, onUpdate: NoAction, map: "FK_F531ED8543485922")
+
+  @@index([IDLOGIN], map: "IDX_F531ED8543485922")
+}
+
+model logs_api {
+  IDLOG        Int       @id @default(autoincrement())
+  ESTATUS_LOG  String?   @db.VarChar(255)
+  FECHA_LOG    DateTime? @db.DateTime(0)
+  IP_ADDRESS   String?   @db.VarChar(255)
+  IDLOGIN      Int?
+  METHOD_LOG   String?   @db.VarChar(255)
+  FUNCTION_LOG String?   @db.VarChar(255)
+  RESPONSE_LOG String?   @db.LongText
+  login        login?    @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_F531ED8543485913")
+
+  @@index([IDLOGIN], map: "IDX_F531ED8543485913")
+}
+
+model event {
+  ID_EVENT       Int      @id @default(autoincrement())
+  EVENTNAME      String   @db.VarChar(255)
+  TIMESTAP       DateTime @db.DateTime(0)
+  USER           String?  @db.VarChar(255)
+  SESSION_ID     String?  @db.VarChar(255)
+  EVENTDATA      Json
+  SDK_VERSION    String?  @db.VarChar(50)
+  CLIENT_ID      String?  @db.VarChar(255)
+  SCHEMA_VERSION String?  @db.VarChar(50)
+}
+
+
+
+model metodos_logeo {
+  ID_METODO_LOGEO         Int     @id @default(autoincrement())
+  NOMBRE_METODO_LOGEO     String  @db.VarChar(255)
+  HABILITADO_METODO_LOGEO Boolean @default(true)
+  SLUG                    String? @unique @db.VarChar(255)
+}
+
+
+
+model multimedia_post {
+  ID_MULTIMEDIA      Int              @id @default(autoincrement())
+  ARCHIVO_MULTIMEDIA String?          @db.VarChar(500)
+  THUMBNAIL_MULTIMEDIA String?        @db.VarChar(500)
+  ID_POST            Int
+  ORDER              Int?
+  DESCRIPCION        String?          @db.VarChar(300)
+  MULTIMEDIA_TYPE    String?          @db.VarChar(50)
+  post               post             @relation(fields: [ID_POST], references: [ID_POST], onDelete: Cascade, onUpdate: NoAction, map: "FK_E5F4439B2F2EA191")
+  multimedia_pot     multimedia_pot[]
+
+  @@index([ID_POST], map: "IDX_E5F4439B2F2EA191")
+}
+
+model multimedia_pot {
+  ID_MULTIMEDIA_POT Int             @id @default(autoincrement())
+  CORDENADA_X       Float?
+  CORDENADA_Y       Float?
+  ID_MULTIMEDIA     Int
+  DESCRIPCION       String?         @db.VarChar(255)
+  USERNAME          String?         @db.VarChar(500)
+  multimedia_post   multimedia_post @relation(fields: [ID_MULTIMEDIA], references: [ID_MULTIMEDIA], onDelete: Cascade, onUpdate: NoAction, map: "FK_B0F3733C646B2586")
+
+  @@index([ID_MULTIMEDIA], map: "IDX_B0F3733C646B2586")
+}
+
+model notificaciones {
+  ID_NOTIFICACION Int       @id @default(autoincrement())
+  IDLOGIN         Int
+  IDESTADO        Int
+  FECHA_REGISTRO  DateTime  @db.DateTime(0)
+  TITULO          String    @db.VarChar(500)
+  DETALLE         String    @db.LongText
+  CODIGO          String    @db.VarChar(100)
+  CATEGORIA       String    @db.VarChar(20)
+  REMITE          String?   @db.VarChar(100)
+  FECHA_EDITO     DateTime? @db.DateTime(0)
+  estado          estados   @relation(fields: [IDESTADO], references: [IDESTADO], onDelete: NoAction, onUpdate: NoAction)
+  login           login     @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([IDLOGIN])
+  @@index([IDESTADO])
+}
+
+
+
+model pais {
+  IDPAIS      Int        @id @default(autoincrement())
+  NOMBRE_PAIS String     @db.VarChar(45)
+  COD_PAIS    String     @db.VarChar(4)
+  COD_AREA    Int?
+  LANG        String?    @db.VarChar(5)
+  usuarios    usuarios[]
+}
+
+model post {
+  ID_POST             Int                 @id @default(autoincrement())
+  DESCRIPCION         String              @db.VarChar(500)
+  FECHA_CREACION      DateTime            @db.DateTime(0)
+  FECHA_EDICION       DateTime?           @db.DateTime(0)
+  SLUG_POST           String              @unique(map: "UNIQ_5A8A6C8D474C4444") @db.VarChar(500)
+  IDLOGIN             Int
+  comentarios_post    comentarios_post[]
+  multimedia_post     multimedia_post[]
+  login               login               @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_5A8A6C8D43485913")
+  post_etiquetas      post_etiquetas[]
+  post_reaccion       post_reaccion[]
+  posts_guardados     posts_guardados[]
+
+  @@index([IDLOGIN], map: "IDX_5A8A6C8D43485913")
+}
+
+model post_reaccion {
+  ID_POST_REACCION Int           @id @default(autoincrement())
+  FECHA_REACCION   DateTime      @db.DateTime(0)
+  IDLOGIN          Int
+  ID_POST          Int
+  IDTIPO_REACCION  Int
+  tipo_reaccion    tipo_reaccion @relation(fields: [IDTIPO_REACCION], references: [IDTIPO_REACCION], onDelete: NoAction, onUpdate: NoAction, map: "FK_D6F4E170275AE3C3")
+  post             post          @relation(fields: [ID_POST], references: [ID_POST], onDelete: Cascade, onUpdate: NoAction, map: "FK_D6F4E1702F2EA199")
+  login            login         @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_D6F4E17043485918")
+
+  @@unique([IDLOGIN, ID_POST], map: "IDLOGIN_ID_POST")
+  @@index([IDTIPO_REACCION], map: "IDX_D6F4E170275AE3C3")
+  @@index([ID_POST], map: "FK_D6F4E1702F2EA199")
+}
+
+model etiquetas {
+  ID_ETIQUETA     Int              @id @default(autoincrement())
+  NOMBRE_ETIQUETA String           @unique @db.VarChar(100)
+  post_etiquetas  post_etiquetas[]
+}
+
+model post_etiquetas {
+  ID_POST     Int
+  ID_ETIQUETA Int
+  etiqueta    etiquetas @relation(fields: [ID_ETIQUETA], references: [ID_ETIQUETA], onDelete: Cascade)
+  post        post      @relation(fields: [ID_POST], references: [ID_POST], onDelete: Cascade)
+
+  @@id([ID_POST, ID_ETIQUETA])
+  @@index([ID_ETIQUETA])
+}
+
+model posts_guardados {
+  ID_GUARDADO Int      @id @default(autoincrement())
+  FECHA       DateTime @db.DateTime(0)
+  IDLOGIN     Int
+  ID_POST     Int
+  login       login    @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction)
+  post        post     @relation(fields: [ID_POST], references: [ID_POST], onDelete: Cascade)
+
+  @@index([IDLOGIN])
+  @@index([ID_POST])
+}
+
+
+model provincias {
+  IDPROVINCIA      Int        @id @default(autoincrement())
+  NOMBRE_PROVINCIA String     @db.VarChar(255)
+  REGION_PROVINCIA String?    @db.VarChar(255)
+  ciudades         ciudades[]
+}
+
+model public_user {
+  IDUSUARIO Int    @id @default(autoincrement())
+  USERNAME  String @unique(map: "UNIQ_F6CE94983E6D9A3B") @db.VarChar(255)
+  PASSWORD  String @db.VarChar(255)
+}
+
+
+
+model respuestas_post {
+  ID_RESPUESTA     Int               @id @default(autoincrement())
+  RESPUESTA        String            @db.VarChar(500)
+  FECHA_RESPUESTA  DateTime          @db.DateTime(0)
+  FECHA_EDICION    DateTime?         @db.DateTime(0)
+  ID_COMENTARIO    Int
+  IDLOGIN          Int
+  likes_respuestas likes_respuesta[]
+  login            login             @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_6A769A6A43485913")
+  comentarios_post comentarios_post  @relation(fields: [ID_COMENTARIO], references: [ID_COMENTARIO], onDelete: Cascade, onUpdate: NoAction, map: "FK_6A769A6A4ECBEAE7")
+
+  @@index([IDLOGIN], map: "IDX_6A769A6A43485913")
+  @@index([ID_COMENTARIO], map: "IDX_6A769A6A4ECBEAE7")
+}
+
+model likes_respuesta {
+  ID_LIKE      Int             @id @default(autoincrement())
+  IDLOGIN      Int
+  ID_RESPUESTA Int
+  FECHA        DateTime        @db.DateTime(0)
+  respuesta    respuestas_post @relation(fields: [ID_RESPUESTA], references: [ID_RESPUESTA], onDelete: Cascade, onUpdate: NoAction, map: "FK_6A769A6A4ECBEA23")
+  login        login           @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_9A769A6A43485649")
+
+  @@unique([IDLOGIN, ID_RESPUESTA], map: "IDLOGIN_ID_RESPUESTA")
+  @@index([IDLOGIN], map: "FK_9A769A6A43485649")
+  @@index([ID_RESPUESTA], map: "FK_6A769A6A4ECBEA23")
+}
+
+
+
+
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model seguidores {
+  ID_SEGUIRDORES                      Int       @id @default(autoincrement())
+  FECHA_CREACION                      DateTime  @db.DateTime(0)
+  ESTADO                              String    @db.VarChar(255)
+  FECHA_ACTUALIZACION                 DateTime? @db.DateTime(0)
+  ID_SEGUIDOR                         Int
+  ID_SEGUIDO                          Int
+  BLOQUEADO                           Boolean?
+  login_seguidores_ID_SEGUIDORTologin login     @relation("seguidores_ID_SEGUIDORTologin", fields: [ID_SEGUIDOR], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_2A81AF38B0073AD6")
+  login_seguidores_ID_SEGUIDOTologin  login     @relation("seguidores_ID_SEGUIDOTologin", fields: [ID_SEGUIDO], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_2A81AF38D8C8840E")
+
+  @@index([ID_SEGUIDOR], map: "IDX_2A81AF38B0073AD6")
+  @@index([ID_SEGUIDO], map: "IDX_2A81AF38D8C8840E")
+}
+
+
+model tipo_reaccion {
+  IDTIPO_REACCION Int             @id @default(autoincrement())
+  NOMBRE          String          @db.VarChar(255)
+  ICONO           String?         @db.VarChar(255)
+  ACTIVO          Boolean?        @default(true)
+  post_reaccion   post_reaccion[]
+}
+
+model token {
+  IDTOKEN           Int       @id @default(autoincrement())
+  CODIGO_TOKEN      String?   @db.Text
+  FECHA_TOKEN       DateTime? @db.DateTime(0)
+  VENCIMIENTO_TOKEN DateTime? @db.DateTime(0)
+  IDLOGIN           Int
+  REFRESH_EXPIRES   DateTime? @db.DateTime(0)
+  REFRESH_TOKEN     String?   @db.Text
+  FECHA_RESGISTRO   DateTime? @db.DateTime(0)
+  login             login     @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_5F37A13B43485913")
+
+  @@index([IDLOGIN], map: "IDX_5F37A13B43485913")
+}
+
+model usuarios {
+  IDUSUARIO                   Int                    @id @default(autoincrement())
+  DNI_USUARIO                 String?                @unique(map: "UNIQ_EF687F2F31E299D") @db.VarChar(30)
+  NOMBRE_USUARIO              String                 @db.VarChar(255)
+  APELLIDO_USUARIO            String?                @db.VarChar(255)
+  AVATAR_USUARIO              String?                @db.VarChar(120)
+  TIPO_DOCUMENTO_USUARIO      String?                @db.VarChar(255)
+  GENERO_USUARIO              String?                @db.VarChar(255)
+  IDLOGIN                     Int                    @unique(map: "UNIQ_EF687F243485913")
+  IDPAIS                      Int?
+  IDESTADO                    Int?
+  FECHA_NACIMIENTO_USUARIO    DateTime?              @db.Date
+  USUARIO_HAS_VERIFIED        Boolean?               @default(false)
+  LIMITE_BIOMETRICO           Int?
+  FECHA_BIOMETRICO            DateTime?              @db.DateTime(0)
+  MINIMUM_PURCHASE_BIOMETRIC  Int?                   @default(500)
+  USUARIO_REQUIERE_BIOMETRICO Boolean?               @default(true)
+  CELULAR_USUARIO             String?                @unique(map: "UNIQ_EF687F4F31E299D") @db.VarChar(255)
+  PUBLIC_PROFILE              Boolean?               @default(true)
+  NOTIFICACION_PUSH           Boolean?               @default(false)
+  NOTIFICACION_EMAIL          Boolean?               @default(true)
+  login                       login                  @relation(fields: [IDLOGIN], references: [IDLOGIN], onDelete: NoAction, onUpdate: NoAction, map: "FK_EF687F243485913")
+  pais                        pais?                  @relation(fields: [IDPAIS], references: [IDPAIS], onDelete: NoAction, onUpdate: NoAction, map: "FK_EF687F25D6A18D9")
+  estados                     estados?               @relation(fields: [IDESTADO], references: [IDESTADO], onDelete: NoAction, onUpdate: NoAction, map: "FK_EF687F284D3D003")
+
+  @@index([IDPAIS], map: "IDX_EF687F25D6A18D9")
+  @@index([IDESTADO], map: "IDX_EF687F284D3D003")
+}

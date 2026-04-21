@@ -1,0 +1,47 @@
+{{> header }}
+
+<div style="text-align: left; padding: 0 10px;">
+    
+    <h2 style="color: #2c3e50; font-size: 20px; margin-bottom: 20px; text-align: center;">Solicitud de Retiro de Ganancias</h2>
+
+    <p style="font-size: 16px; color: #333333;">Hola, equipo contable.</p>
+
+    <div style="background-color: #e8f4f8; border-left: 4px solid #3498db; padding: 15px 20px; border-radius: 4px; margin-bottom: 25px; font-size: 15px; line-height: 1.6; color: #333333;">
+        {{message}}
+    </div>
+
+    <p style="font-size: 15px; color: #333333; margin-bottom: 20px;">
+        A continuación, se detalla la información financiera correspondiente para su revisión y respectiva transferencia:
+    </p>
+
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+        <tr>
+            <th style="padding: 12px 15px; text-align: left; border-bottom: 1px solid #eeeeee; color: #7f8c8d; font-weight: 600; font-size: 13px; text-transform: uppercase; width: 45%;">Vendedor Solicitante</th>
+            <td style="padding: 12px 15px; text-align: left; border-bottom: 1px solid #eeeeee; font-size: 15px; font-weight: 500; color: #333333;">{{user}}</td>
+        </tr>
+        <tr>
+            <th style="padding: 12px 15px; text-align: left; border-bottom: 1px solid #eeeeee; color: #7f8c8d; font-weight: 600; font-size: 13px; text-transform: uppercase;">Monto Solicitado (Base)</th>
+            <td style="padding: 12px 15px; text-align: left; border-bottom: 1px solid #eeeeee; font-size: 15px; font-weight: 500; color: #333333;">${{valor_base}}</td>
+        </tr>
+        <tr>
+            <th style="padding: 12px 15px; text-align: left; border-bottom: 1px solid #eeeeee; color: #7f8c8d; font-weight: 600; font-size: 13px; text-transform: uppercase;">Comisión</th>
+            <td style="padding: 12px 15px; text-align: left; border-bottom: 1px solid #eeeeee; font-size: 15px; font-weight: 500; color: #e74c3c;">- ${{comision}}</td>
+        </tr>
+        <tr style="background-color: #f9fbfb;">
+            <th style="padding: 15px; text-align: left; border-bottom: 1px solid #eeeeee; color: #27ae60; font-weight: bold; font-size: 14px; text-transform: uppercase;">Total a Transferir</th>
+            <td style="padding: 15px; text-align: left; border-bottom: 1px solid #eeeeee; font-weight: bold; color: #27ae60; font-size: 18px;">${{valor_final}}</td>
+        </tr>
+    </table>
+
+    <div style="text-align: center; margin: 35px 0 25px 0;">
+        <a href="https://admin.shopby.com.ec/retiros" style="background-color: #3498db; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 5px; font-weight: bold; font-size: 15px; display: inline-block;">Revisar en Panel Administrativo</a>
+    </div>
+
+    <div style="text-align: center; font-size: 12px; color: #999999; margin-top: 30px; border-top: 1px solid #eeeeee; padding-top: 20px;">
+        <p style="margin: 0 0 5px 0;">Este es un mensaje automático generado por el sistema administrativo.</p>
+        <p style="margin: 0;">Por favor, no respondas directamente a este correo.</p>
+    </div>
+
+</div>
+
+{{> footer }}

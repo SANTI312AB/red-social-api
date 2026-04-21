@@ -1,0 +1,70 @@
+services:
+  # Servicio de la Base de Datos (MySQL)
+  db:
+    image: mysql:8.4
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      # Se usa solo la contraseña de root para simplificar el entorno de pruebas
+      MYSQL_ROOT_PASSWORD: '@C9bf46fe' # Cambia esto por una contraseña segura
+      MYSQL_DATABASE: prueba # El nombre de tu base de datos
+    ports:
+      # Expone el puerto de MySQL a tu máquina local
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password --default-time-zone='+00:00'
+    volumes:
+      # Persiste los datos de la base de datos en un volumen de Docker
+      - db_data:/var/lib/mysql
+      # Monta tu script SQL para la inicialización automática
+      - ./script/shopby_nest.sql:/docker-entrypoint-initdb.d/1.sql
+    networks:
+      - shopby-network
+
+  # Servicio de phpMyAdmin para administrar la base de datos
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      # Expone la interfaz web de phpMyAdmin en el puerto 8080
+      - "8080:80"
+    environment:
+      PMA_HOST: db # Apunta al nombre del servicio de la base de datos
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 10M
+      POST_MAX_SIZE: 10M
+    networks:
+      - shopby-network
+
+  # Servicio de la Aplicación NestJS
+  app:
+    container_name: shopby-nest
+    restart: unless-stopped
+    # Construye la imagen usando el Dockerfile en la carpeta raíz del proyecto
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        - DOCKER_BUILDKIT=1
+    ports:
+      # Expone el puerto de tu aplicación NestJS
+      - "3000:3000"
+    depends_on:
+      - db # Se asegura de que la base de datos se inicie antes que la app
+    env_file:
+      - ./.env
+    volumes:
+       - ./:/usr/src/app
+       - /usr/src/app/node_modules
+    command: npm run start:dev
+    networks:
+      - shopby-network
+
+# Define las redes y volúmenes
+volumes:
+  db_data:
+
+networks:
+  shopby-network:
