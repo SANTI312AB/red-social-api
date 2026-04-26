@@ -10,7 +10,7 @@ export class DispositivoDto {
   @ApiProperty({description:'Añadir ID del dispositivo.'})
   @IsString({ message: 'El ID del dispositivo debe ser un texto válido.' })
   @IsNotEmpty({ message: 'El ID del dispositivo es obligatorio.' })
-  deviceId: string; // Aquí recibirás valores como 'android', 'ios' o 'web'
+  deviceId: string; // Aquí recibirás el deviceId generado por el cliente
 
   @ApiProperty({description:'Añadir plataforma del dispositivo.'})
   @IsString({ message: 'La plataforma del dispositivo debe ser un texto válido.' })
