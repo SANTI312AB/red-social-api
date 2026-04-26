@@ -695,42 +695,70 @@ export class AuthService {
   /**
    * Cierra la sesión del usuario eliminando su token de la base de datos.
    */
-  async logout(authHeader: string) {
-    // --- CAMBIO 1: Se añade validación del encabezado ---
-    // Verificamos que el encabezado exista y tenga el formato correcto.
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  /**
+ * Cierra la sesión del usuario eliminando su token y limpiando la relación con el dispositivo.
+ */
+async logout(authHeader: string, deviceId?: string) {
+  // 1. Validación de encabezado
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return this.responseService.error(
+      'Encabezado de autorización inválido o ausente.',
+      HttpStatus.UNAUTHORIZED,
+    );
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    // 2. Buscar el token y validar su existencia
+    const tokenRecord = await this.prisma.token.findFirst({
+      where: { CODIGO_TOKEN: token },
+      include: { login: true },
+    });
+
+    if (!tokenRecord) {
       return this.responseService.error(
-        'Encabezado de autorización inválido o ausente.',
-        HttpStatus.UNAUTHORIZED,
+        'Este token ya no es válido o ya fue eliminado.',
+        HttpStatus.BAD_REQUEST,
       );
     }
 
-    // --- CAMBIO 2: Se extrae el token del encabezado ---
-    const token = authHeader.split(' ')[1];
-
-    try {
-      // La lógica principal para borrar el token de la base de datos
-      // se mantiene exactamente igual, pero ahora usa el token extraído.
-      const result = await this.prisma.token.deleteMany({
-        where: { CODIGO_TOKEN: token },
+    // 3. Ejecutar limpieza en una transacción
+    await this.prisma.$transaction(async (tx) => {
+      
+      // Borrar el token físico
+      await tx.token.delete({
+        where: { IDTOKEN: tokenRecord.IDTOKEN },
       });
 
-      if (result.count === 0) {
-        return this.responseService.error(
-          'Este token ya no es válido.',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+      // Si se pasó un deviceId, desconectar/limpiar la relación de dispositivo
+      if (deviceId) {
+        const device = await tx.dispositivos.findFirst({
+          where: { DEVICE_ID: deviceId },
+        });
 
-      return this.responseService.success('Sesión cerrada exitosamente.');
-    } catch (error) {
-      console.error('Error durante el logout:', error);
-      return this.responseService.error(
-        'No se pudo cerrar la sesión.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+        if (device) {
+          // Eliminamos la relación específica entre este login y este dispositivo
+          await tx.login_dispositivos.deleteMany({
+            where: {
+              IDLOGIN: tokenRecord.IDLOGIN,
+              IDDISPOSITIVO: device.ID_DISPOSITIVO,
+            },
+          });
+        }
+      }
+    });
+
+    return this.responseService.success('Sesión cerrada y dispositivo desvinculado exitosamente.');
+
+  } catch (error) {
+    console.error('Error durante el logout:', error);
+    return this.responseService.error(
+      'No se pudo procesar el cierre de sesión.',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
   }
+}
 
   async getProfile(userId: number) {
     // 2. Llama al método del servicio inyectado dentro de un try...catch

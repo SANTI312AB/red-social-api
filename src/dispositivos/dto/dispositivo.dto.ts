@@ -7,8 +7,13 @@ export class DispositivoDto {
   @IsNotEmpty({ message: 'El token del dispositivo es obligatorio.' })
   token: string;
 
-  @ApiProperty({description:'Añadir codigo del dispositivo.'})
-  @IsString({ message: 'El código del dispositivo debe ser un texto válido.' })
-  @IsNotEmpty({ message: 'El código  es obligatorio.' })
-  codigo: string; // Aquí recibirás valores como 'android', 'ios' o 'web'
+  @ApiProperty({description:'Añadir ID del dispositivo.'})
+  @IsString({ message: 'El ID del dispositivo debe ser un texto válido.' })
+  @IsNotEmpty({ message: 'El ID del dispositivo es obligatorio.' })
+  deviceId: string; // Aquí recibirás valores como 'android', 'ios' o 'web'
+
+  @ApiProperty({description:'Añadir plataforma del dispositivo.'})
+  @IsString({ message: 'La plataforma del dispositivo debe ser un texto válido.' })
+  @IsNotEmpty({ message: 'La plataforma del dispositivo es obligatoria.' })
+  platform: string; // Aquí recibirás valores como 'android', 'ios' o 'web'
 }

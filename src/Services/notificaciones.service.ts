@@ -50,9 +50,23 @@ export class NotificacionesService{
     }
 
   async notificaciones_push(userId: number, titulo: string, cuerpo: string, dataPayload?: any) {
+
+    const user= await this.prisma.login.findFirst({
+            where:{
+                IDLOGIN:userId,
+                IDESTADO:1,
+                IDVERIFICACION:7
+            }
+        });
+
+        if(!user){
+          this.logger.error('Usuario no encontrado.');
+          return;
+        }
+
     // 1. Buscamos todos los dispositivos vinculados a este usuario
     const dispositivosUsuario = await this.prisma.login_dispositivos.findMany({
-      where: { IDLOGIN: userId },
+      where: { IDLOGIN: user.IDLOGIN },
       include: { 
         dispositivos: true // Traemos la info de la tabla 'dispositivos'
       } 
@@ -94,6 +108,7 @@ export class NotificacionesService{
             if (error === 'messaging/invalid-registration-token' || error === 'messaging/registration-token-not-registered') {
               tokensParaBorrar.push(tokens[index]);
             }
+            this.logger.warn(`⚠️ Token inválido para usuario ${userId}: ${tokens[index]} - Error: ${error}`);
           }
         });
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 21-04-2026 a las 17:09:46
+-- Tiempo de generación: 26-04-2026 a las 00:14:07
 -- Versión del servidor: 8.4.7
 -- Versión de PHP: 8.5.5
 
@@ -647,9 +647,11 @@ CREATE TABLE IF NOT EXISTS `dispositivos` (
   `ID_DISPOSITIVO` int NOT NULL AUTO_INCREMENT,
   `TOKEN` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `FECHA_REGISTRO` datetime NOT NULL,
-  `FECHA_ACTUALIZO` datetime NOT NULL,
-  `CODIGO` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`ID_DISPOSITIVO`)
+  `FECHA_ACTUALIZO` datetime DEFAULT NULL,
+  `DEVICE_ID` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `PLATFORM` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`ID_DISPOSITIVO`),
+  UNIQUE KEY `dispositivos_DEVICE_ID_key` (`DEVICE_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------

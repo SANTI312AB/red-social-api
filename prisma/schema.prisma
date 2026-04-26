@@ -134,9 +134,10 @@ model login {
 model dispositivos{
   ID_DISPOSITIVO Int @id @default(autoincrement()) 
   TOKEN          String @db.Text
-  CODIGO           String @db.VarChar(20)
+  DEVICE_ID      String @db.VarChar(300) @unique()
+  PLATFORM        String @db.VarChar(20)
   FECHA_REGISTRO DateTime  @db.DateTime(0)
-  FECHA_ACTUALIZO DateTime @db.DateTime(0)
+  FECHA_ACTUALIZO DateTime? @db.DateTime(0)
   login_dispositivos login_dispositivos[]
 }
 

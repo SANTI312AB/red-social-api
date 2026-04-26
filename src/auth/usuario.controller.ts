@@ -19,6 +19,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { InjectIdsInterceptor } from 'src/utilis/inject-user.interceptor';
+import { LogoutDto } from './dto/logout.dto';
 
 @ApiTags('Usuario')
 @Controller('api') 
@@ -94,12 +95,11 @@ export class UsuarioController extends ApiController {
   @ApiOperation({ summary: 'Cerrar la sesión del usuario actual' })
   @ApiResponse({ status: 200, description: 'Sesión cerrada exitosamente.' })
   @ApiResponse({ status: 401, description: 'No autorizado.' })
-  // 1. Usamos el decorador @Request() para obtener el objeto de la petición.
-  async logout(@Request() req) {
+  async logout(@Request() req, @Body() logoutDto: LogoutDto) {
     // 2. El token está en el encabezado de la petición.
     const authHeader = req.headers.authorization;
     
     // 3. Llamamos a la función de logout en el servicio, pasándole el encabezado completo.
-    return this.authService.logout(authHeader);
+    return this.authService.logout(authHeader, logoutDto.deviceId);
   }
 }

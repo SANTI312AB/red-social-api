@@ -15,7 +15,7 @@ export class DispositivosService {
     try {
       // 1. Buscamos si el token (dispositivo) ya existe en la base de datos
       let dispositivo = await this.prisma.dispositivos.findFirst({
-        where: { TOKEN: dto.token }
+        where: { DEVICE_ID: dto.deviceId }
       });
 
       // 2. Si no existe, lo creamos
@@ -23,16 +23,16 @@ export class DispositivosService {
         dispositivo = await this.prisma.dispositivos.create({
           data: {
             TOKEN: dto.token,
-            CODIGO: dto.codigo, // ej: 'android', 'ios', 'web'
+            DEVICE_ID: dto.deviceId,
+            PLATFORM: dto.platform,
             FECHA_REGISTRO: new Date(),
-            FECHA_ACTUALIZO: new Date(),
           }
         });
       } else {
         // Si existe, actualizamos su fecha (para saber que sigue activo)
         dispositivo = await this.prisma.dispositivos.update({
           where: { ID_DISPOSITIVO: dispositivo.ID_DISPOSITIVO },
-          data: { FECHA_ACTUALIZO: new Date(), CODIGO: dto.codigo }
+          data: { FECHA_ACTUALIZO: new Date(), DEVICE_ID: dto.deviceId, PLATFORM: dto.platform }
         });
       }
 
