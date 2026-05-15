@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { HashPasswordService } from 'src/utilis/hash_password';
 import { randomBytes } from 'crypto';
 import { ResponseService } from 'src/Interfaces/response.service';
+import { HashIdService } from 'src/utilis/hash-id.service';
 const { v4: uuidv4 } = require('uuid');
 
 @Injectable()
@@ -19,6 +20,7 @@ export class AppleAuthService {
     private jwtService: JwtService,
     private hashService: HashPasswordService,
     private responseService: ResponseService,
+    private hash: HashIdService,
     
   ) {}
 
@@ -103,7 +105,7 @@ export class AppleAuthService {
       // ==========================================
 
       // F. Generar tu propio JWT
-      const payload = { sub: login.IDLOGIN, username: login.USUARIO_LOGIN, jti: uuidv4() };
+      const payload = { sub: this.hash.encode(login.IDLOGIN), username: login.USUARIO_LOGIN, jti: uuidv4() };
 
       const accessToken = this.jwtService.sign(payload, {
         expiresIn: '12h',
@@ -204,12 +206,17 @@ export class AppleAuthService {
           }
         });
 
+  
+
+        console.log('Usuario creado con email:', newLogin.EMAIL_LOGIN);
 
         return newLogin;
       });
 
     } else {
       // USUARIO EXISTENTE - Solo actualizamos su Apple ID y Last Login
+
+      console.log('Usuario existente encontrado con email:', login.EMAIL_LOGIN);
       login = await this.prisma.login.update({
         where: { IDLOGIN: login.IDLOGIN },
         data: {
@@ -221,4 +228,5 @@ export class AppleAuthService {
 
     return login;
   }
+
 }

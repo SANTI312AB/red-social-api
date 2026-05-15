@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 26-04-2026 a las 00:14:07
+-- Tiempo de generación: 15-05-2026 a las 15:48:10
 -- Versión del servidor: 8.4.7
 -- Versión de PHP: 8.5.5
 
@@ -929,6 +929,25 @@ CREATE TABLE IF NOT EXISTS `logs_api` (
   PRIMARY KEY (`IDLOG`),
   KEY `IDX_F531ED8543485913` (`IDLOGIN`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `mensaje_chat`
+--
+
+CREATE TABLE IF NOT EXISTS `mensaje_chat` (
+  `IDMENSAJE` int NOT NULL AUTO_INCREMENT,
+  `TEXTO` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `IDLOGIN_REMITENTE` int NOT NULL,
+  `IDLOGIN_DESTINO` int NOT NULL,
+  `SALA` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `LEIDO` tinyint(1) NOT NULL DEFAULT '0',
+  `CREADO_EN` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`IDMENSAJE`),
+  KEY `mensaje_chat_IDLOGIN_REMITENTE_fkey` (`IDLOGIN_REMITENTE`),
+  KEY `mensaje_chat_IDLOGIN_DESTINO_fkey` (`IDLOGIN_DESTINO`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 

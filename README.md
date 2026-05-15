@@ -68,7 +68,19 @@ La API no solo entrega contenido cronológico, sino que implementa una lógica d
 * **Tendencias (Engagement):** Listado de posts basados en los **más comentados** y **más reaccionados**.
 * **Personalización:** Sección de posts basados en los intereses y "likes" previos del usuario.
 
+### Chat en linea con websokets
+La API ahora integra un sistema de chat en línea en tiempo real y con persistencia en base de datos, diseñado específicamente para permitir la interacción directa entre el usuario y su lista de cuentas seguidas.
 
+A diferencia de las conexiones HTTP tradicionales, esta funcionalidad utiliza el protocolo WebSocket, lo que permite una comunicación bidireccional y de baja latencia entre el cliente y el servidor.
+
+- Características Principales
+Comunicación en Tiempo Real (WebSockets): Establece un canal de comunicación abierto y permanente. Los mensajes se envían y reciben de forma instantánea sin necesidad de realizar peticiones HTTP repetitivas (polling).
+
+- Persistencia en Base de Datos: Todos los mensajes se almacenan de forma segura al momento de ser enviados. Esto garantiza que el historial de conversación no se pierda y esté disponible cada vez que el usuario inicie sesión.
+
+- Privacidad Basada en Red de Contactos: El sistema valida las relaciones de la plataforma; un usuario solo puede iniciar interacciones de chat con los usuarios a los que sigue activamente.
+
+- Gestión de Estado de Conexión: Permite identificar cuándo un contacto seguido está en línea o desconectado, optimizando la experiencia de usuario (UX).
 
 
 ## Configuración

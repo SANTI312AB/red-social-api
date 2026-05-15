@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as fs from 'fs';
 
 export interface SmtpConfig { host: string; user: string; pass: string; from: string; }
 export interface S3ConnectionConfig { endpoint: string; accessKey: string; secretKey: string; region: string; }
@@ -167,8 +168,7 @@ export class ConfigDbService {
   }
 
   
-
-  async getAppleConfig(): Promise<AppleConnectionConfig> {
+async getAppleConfig(): Promise<AppleConnectionConfig> {
     if (this.appleCache && this.appleCache.expiresAt > Date.now()) {
       return this.appleCache.data;
     }
@@ -191,7 +191,7 @@ export class ConfigDbService {
       client_id: config.Login,
       team_id: config.Team,
       key_id: config.SecretKey,
-      private_key: process.env.P8_FILE || '', // Se recomienda almacenar la clave privada en una variable de entorno por seguridad
+      private_key: process.env.P8_FILE ? fs.readFileSync(process.env.P8_FILE, 'utf8') : '',
       callback_url: config.Url
     };
 

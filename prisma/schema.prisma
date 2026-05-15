@@ -125,6 +125,8 @@ model login {
   token                                    token[]
   usuarios                                 usuarios?
   login_dispositivos                       login_dispositivos[]
+  mensajes_enviados                        mensaje_chat[] @relation("Enviados")
+  mensajes_recibidos                       mensaje_chat[] @relation("Recibidos")
 
   @@index([IDVERIFICACION], map: "IDX_AA08CB103AB8AF19")
   @@index([IDESTADO], map: "IDX_AA08CB1084D3D003")
@@ -433,4 +435,19 @@ model usuarios {
 
   @@index([IDPAIS], map: "IDX_EF687F25D6A18D9")
   @@index([IDESTADO], map: "IDX_EF687F284D3D003")
+}
+
+
+model mensaje_chat {
+  IDMENSAJE    Int      @id @default(autoincrement())
+  TEXTO        String   @db.Text
+  IDLOGIN_REMITENTE Int      
+  IDLOGIN_DESTINO   Int      
+  SALA              String   @db.VarChar(255)
+  LEIDO             Boolean  @default(false)
+  
+  CREADO_EN    DateTime @default(now())
+  // Relaciones
+  remitente    login    @relation("Enviados", fields: [IDLOGIN_REMITENTE], references: [IDLOGIN])
+  destino      login    @relation("Recibidos", fields: [IDLOGIN_DESTINO], references: [IDLOGIN])
 }

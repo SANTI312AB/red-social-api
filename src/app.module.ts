@@ -25,6 +25,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { NotificacionesModule } from './notificaciones/notificaciones.module';
 import { EventsModules } from './Events/EventsModule';
 import { DispositivoModule } from './dispositivos/dispositivo.module';
+import {ChatModule} from "./chat/chat.module";
+
 @Module({
   imports: [   
     ConfigModule.forRoot({isGlobal: true}),// Esto carga el archivo .env inmediatamente al iniciar la app
@@ -46,7 +48,8 @@ import { DispositivoModule } from './dispositivos/dispositivo.module';
     EmailModule,
     NotificacionesModule,
     DispositivoModule,
-    EventsModules
+    EventsModules,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [
